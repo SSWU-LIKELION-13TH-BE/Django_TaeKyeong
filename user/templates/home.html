@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+{{nickname}}님 안녕하세요.
+home page
+<a href="{% url "logout" %}">logout</a>
+<p>You can change your password <a href="{% url 'password_reset' %}"> here</a></p>
+{% endblock content %}

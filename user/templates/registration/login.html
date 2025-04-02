@@ -1,0 +1,8 @@
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+    <a href="{% url "signup" %}">회원가입하러 가기</a>
+    <br />
+    <p>You can change your password <a href="{% url "password_change" %}"> here</a></p>
+</form>
