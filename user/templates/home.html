@@ -1,7 +1,19 @@
-{% extends "base.html" %}
-{% block content %}
-{{nickname}}님 안녕하세요.
-home page
-<a href="{% url "logout" %}">logout</a>
-<p>You can change your password <a href="{% url 'password_reset' %}"> here</a></p>
-{% endblock content %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    {% extends "base.html" %}
+    {% block content %}
+    {{nickname}}님 안녕하세요.
+    <br>
+    home page
+    {% endblock content %}
+</body>
+
+</html>
