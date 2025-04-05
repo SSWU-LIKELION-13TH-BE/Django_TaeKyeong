@@ -9,4 +9,10 @@ class SignUpForm(UserCreationForm):
     
     class Meta:
         model = CustomUser
-        fields = ['username','nickname', 'email','phone_number', 'password1', 'password2']
+        fields = ['username','nickname','id', 'email','phone_number', 'password1', 'password2']
+
+
+
+class LoginForm(forms.Form):
+    id=forms.CharField(label='아이디')
+    password=forms.CharField(label='비밀번호', widget=forms.PasswordInput)
