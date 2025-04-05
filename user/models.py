@@ -1,5 +1,6 @@
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.contrib.auth.models import AbstractUser, Group, Permission, AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+
 
 class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
@@ -11,6 +12,36 @@ class CustomUser(AbstractUser):
 
     #로그인시에 username 필드를 id로 대체하기 위해 추가해준 코드
     USERNAME_FIELD = 'id'
-    
+
     groups=models.ManyToManyField(Group, related_name="customer_set", blank=True)
     user_permissions= models.ManyToManyField(Permission, related_name="customer_permissions_set", blank=True)
+
+
+# admin
+class UserManager(BaseUserManager):
+    def create_user(self, nickname, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("Email is required")
+        if not nickname:
+            raise ValueError("Nickname is required")
+        email = self.normalize_email(email)
+        user = self.model(nickname=nickname, email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, nickname, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(nickname, email, password, **extra_fields)
+
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True)
+    nickname = models.CharField(max_length=30, unique=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'nickname'
+    REQUIRED_FIELDS = ['email']
+
+    objects = UserManager()
