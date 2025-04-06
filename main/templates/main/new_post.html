@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>글쓰기 페이지</title>
+</head>
+<body>
+    <h1>글쓰기 페이지</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        제목 <br>
+        <input type="text" name="postname"><br>
+
+        작성자 닉네임 : {{nickname}} <br>
+
+        기술스택<br>
+        <select name="techstack">
+            <option value="fullstack">Full Stack</option>
+            <option value="frontend">Frontend</option>
+            <option value="backend">Backend</option>
+        </select><br><br>
+
+        Github : <input type="text" name="github"><br>
+
+        내용<br>
+        <textarea rows="10" cols="50" name="contents"></textarea><br>
+        <input type="file" name="mainphoto"><br>
+        <input type="submit" value="글쓰기">
+    </form>
+</body>
+</html>

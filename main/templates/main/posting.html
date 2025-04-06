@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posting</title>
+</head>
+<body>
+    <h1>게시글 개별 페이지</h1>
+    <h2>{{post.postname}}</h2>
+    <b>작성자 닉네임 :</b> {{nickname}} <br>
+    <b>작성자 techstack :</b> {{post.techstack}} <br>
+    <b>작성자 Github :</b> {{post.github}}
+    <p>{{post.contents}}</p>
+
+    <!-- 사진 영역 -->
+    {% if post.mainphoto %}
+        <img src="{{post.mainphoto.url}}" alt="" width="300">
+        <br>
+    {% endif %}
+
+    <!-- 좋아요 영역 -->
+    <form action="{% url 'main:like_post' post.pk %}" method="POST">
+        {% csrf_token %}
+        {% if user in post.like_users.all %}
+          <button type="submit">❤️ 좋아요 취소</button>
+        {% else %}
+          <button type="submit">🤍 좋아요</button>
+        {% endif %}
+        <span>{{ post.like_users.count }}명 좋아요</span>
+    </form>
+      
+    <a href="/blog/">목록</a>
+    <a href="/blog/{{post.pk}}/remove">삭제</a>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog List</title>
+</head>
+
+<body>
+    <h1>게시판 페이지</h1>
+    <table>
+        {% for list in postlist %}
+        <ul>
+            <li><a href="{{list.pk}}/">{{list.postname}}</a></li>
+        </ul>
+        {% endfor %}
+    </table>
+
+    <button><a href="new_post/">글쓰기</a></button>
+</body>
+
+</html>
