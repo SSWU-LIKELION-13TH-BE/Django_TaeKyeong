@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login
 from django.contrib import messages
+from django.http import JsonResponse
 from .forms import SignUpForm, LoginForm
 from .models import CustomUser
 
@@ -35,11 +36,21 @@ def login_view(request):
             #이 코드에서 사용자가 제출한 id와 pwd가 실제 db에 있는 유저인지 검증
             user = authenticate(request, username=id, password=password)
 
+            print (f'views.py, user: {user}, id: {id}, password: {password}')
+
             if user is not None:
                 #user 변수에 재대로 유저변수가 들어옴 = 로그인 진행시켜!(회원가입을 했던 유저이므로)
                 login(request, user)
+                # 로그인 성공 후 사용자 정보를 템플릿으로 전달
+                return JsonResponse({
+                    'id': user.id,
+                    'username': user.username,
+                    'nickname':user.nickname,
+                    'is_authenticated': True,
+                    'redirect_url': '/',
+                    })
                 #로그인 후에는 홈화면으로 리다이렉트
-                return redirect('home')
+                # return redirect('home')
             else:
                 #db에 해당하는 유저가 없으면 해당하는 유저가 없다고 팝업을 띄운다.
                 messages.error(request, '해당하는 유저가 없습니다!')
