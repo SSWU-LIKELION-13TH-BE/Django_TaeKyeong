@@ -1,6 +1,8 @@
 from django.db import models
 from user.models import CustomUser
 from django.utils import timezone
+# try
+from django.contrib.auth import get_user_model
 
 # 게시글 - 제목(postname), 내용(contents) 넣기
 class Post(models.Model):
@@ -25,3 +27,35 @@ class Post(models.Model):
     # 좋아요 수 반환
     def likes_count(self):
         return self.like_users.count()
+
+
+# 댓글 기능
+# class Comment(models.Model):
+#     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')  # 게시글이 삭제되면 댓글도 삭제됨
+#     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # 댓글 작성자
+#     content = models.TextField(max_length=300)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+
+#     # 하나의 댓글에 여러 유저가 좋아요 누를 수 있음
+#     like_users = models.ManyToManyField(CustomUser, related_name='liked_comments', blank=True)
+
+#     # 댓글 내용 일부만 출력시키기 (30자)
+#     def __str__(self):
+#         return self.content[:30]
+
+User = get_user_model()
+
+class Comment(models.Model):
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')  # 대댓글
+    created_at = models.DateTimeField(auto_now_add=True)
+    like_users = models.ManyToManyField(User, related_name='liked_comments', blank=True)  # 댓글 좋아요
+
+    def is_reply(self):
+        return self.parent is not None
+
+    def __str__(self):
+        return f'{self.author} - {self.content[:20]}'

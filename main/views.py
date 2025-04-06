@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from user.models import CustomUser
-from .models import Post
+from .models import Post, Comment
+from .forms import CommentForm
 
 # index.html 페이지를 부르는 index 함수
 def index(request):
@@ -16,11 +17,22 @@ def blog(request):
 # blog의 게시글(posting)을 부르는 posting 함수
 def posting(request, pk):
     # 게시글(Post) 중 pk(primary_key)를 이용해 하나의 게시글(post)을 검색
-    post=Post.objects.get(pk=pk)
+    post=get_object_or_404(Post, pk=pk)
     # author가 None이 아니면 nickname을 가져오고, None이면 '익명'으로 처리
     nickname = post.author.nickname if post.author else '익명'
+    
+    comments = Comment.objects.filter(post=post)
+    comment_form = CommentForm()
+
+    context = {
+        'post':post,
+        'nickname':nickname,
+        'comments':comments,
+        'comment_form':comment_form,
+    }
+    
     # posting.html 페이지를 열 때, 찾아낸 게시글(post)을 post라는 이름으로 가져옴
-    return render(request, 'main/posting.html', {'post': post, 'nickname': nickname})
+    return render(request, 'main/posting.html', context)
 
 # new_post 연결 함수
 def new_post(request):
@@ -68,3 +80,45 @@ def like_post(request, post_pk):
             post.like_users.add(request.user)
         return redirect(request.META.get('HTTP_REFERER'))
     return redirect('/user/login/')
+
+# 댓글 생성
+@require_POST
+def comments_create(request, post_pk):
+    post = get_object_or_404(Post, pk=post_pk)
+    comment_form = CommentForm(request.POST)
+
+    if comment_form.is_valid():
+        comment = comment_form.save(commit=False)
+        comment.post = post
+        comment.author = request.user
+
+        parent_id = request.POST.get('parent_id')
+        if parent_id:
+            parent_comment = get_object_or_404(Comment, pk=parent_id)
+            comment.parent = parent_comment
+
+        comment.save()
+    return redirect('main:posting', pk=post.pk)
+
+
+# 댓글 삭제
+@require_POST
+def comments_delete(request, post_pk, comment_pk):
+    if request.user.is_authenticated:
+        comment = get_object_or_404(Comment, pk=comment_pk)
+        if request.user == comment.author:
+            comment.delete()
+    return redirect('main:posting', pk=post_pk)
+
+# 댓글에 좋아요
+@require_POST
+def like_comment(request, comment_pk):
+    comment = get_object_or_404(Comment, pk=comment_pk)
+    user = request.user
+
+    if user in comment.like_users.all():
+        comment.like_users.remove(user)
+    else:
+        comment.like_users.add(user)
+
+    return redirect('main:posting', pk=comment.post.pk)
