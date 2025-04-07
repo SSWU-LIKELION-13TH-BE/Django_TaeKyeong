@@ -30,20 +30,6 @@ class Post(models.Model):
 
 
 # 댓글 기능
-# class Comment(models.Model):
-#     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')  # 게시글이 삭제되면 댓글도 삭제됨
-#     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # 댓글 작성자
-#     content = models.TextField(max_length=300)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-
-#     # 하나의 댓글에 여러 유저가 좋아요 누를 수 있음
-#     like_users = models.ManyToManyField(CustomUser, related_name='liked_comments', blank=True)
-
-#     # 댓글 내용 일부만 출력시키기 (30자)
-#     def __str__(self):
-#         return self.content[:30]
-
 User = get_user_model()
 
 class Comment(models.Model):

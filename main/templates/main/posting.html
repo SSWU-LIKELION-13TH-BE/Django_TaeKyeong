@@ -64,6 +64,7 @@
       {% if not comment.parent %}
         <li>
           {{ comment.author.nickname }} - {{ comment.content }}
+          <small>(작성 시간: {{ comment.created_at|date:"Y년 m월 d일 H:i" }})</small>
           
           <!-- 좋아요 버튼 -->
           <form action="{% url 'main:like_comment' comment.pk %}" method="POST">
@@ -81,6 +82,7 @@
             {% for reply in comment.replies.all %}
               <li>
                 ↳ {{ reply.author.nickname }} - {{ reply.content }}
+                <small>(작성 시간: {{ comment.created_at|date:"Y년 m월 d일 H:i" }})</small>
                 <!-- 대댓글 좋아요 -->
                 <form action="{% url 'main:like_comment' reply.pk %}" method="POST">
                   {% csrf_token %}
