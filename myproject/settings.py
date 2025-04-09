@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'user'
+    'user',
+    'main',
 ]
 
 MIDDLEWARE = [
@@ -139,7 +140,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'user.CustomUser'
+# AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'user.Customuser'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/user/accounts/login/'
 
@@ -151,3 +153,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = get_secret('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# IMG 관리
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_URL = '/media/'
