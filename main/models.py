@@ -11,6 +11,7 @@ class Post(models.Model):
     mainphoto = models.ImageField(blank=True, null=True)
     techstack = models.CharField(max_length=100, default='Frontend')
     github = models.CharField(max_length=500, default='https://github.com/')
+    view_count = models.PositiveIntegerField(default=0)
 
     # CustomUSer와의 관계를 설정
     author=models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)

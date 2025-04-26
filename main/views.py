@@ -19,6 +19,10 @@ def blog(request):
 def posting(request, pk):
     # 게시글(Post) 중 pk(primary_key)를 이용해 하나의 게시글(post)을 검색
     post=get_object_or_404(Post, pk=pk)
+    # 조회수 증가
+    post.view_count+=1
+    post.save()
+    
     # author가 None이 아니면 nickname을 가져오고, None이면 '익명'으로 처리
     nickname = post.author.nickname if post.author else '익명'
     
@@ -140,7 +144,7 @@ def blog(request):
 
     # 정렬
     postList = postList.annotate(like_count=Count('like_users'))
-    
+
     if sort == 'popular': # 좋아요순
         postList = postList.order_by('-like_users')
     else: # 시간순
