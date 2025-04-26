@@ -9,6 +9,12 @@
 
 <body>
     <h1>게시판 페이지</h1>
+
+    <form method="get" action="{% url 'main:blog' %}">
+        <input type="text" name="search" placeholder="검색" value="{{search_query}}" >
+        <button type="submit">검색</button>
+    </form>
+    
     <table>
         {% for list in postlist %}
         <ul>

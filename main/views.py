@@ -3,6 +3,7 @@ from django.views.decorators.http import require_POST
 from user.models import CustomUser
 from .models import Post, Comment
 from .forms import CommentForm
+from django.db.models import Q
 
 # index.html 페이지를 부르는 index 함수
 def index(request):
@@ -122,3 +123,16 @@ def like_comment(request, comment_pk):
         comment.like_users.add(user)
 
     return redirect('main:posting', pk=comment.post.pk)
+
+# blog함수 생성
+def blog(request):
+    # 검색어를 가져오고, 검색어가 없다면 빈 상태
+    search_query = request.GET.get('search', '')
+    if search_query:
+        # 제목에 검색어가 포함된 글 리스트 (대소문자 구분 없이)
+        postList = Post.objects.filter(postname__icontains=search_query)
+    else:
+        # 검색어가 없다면 모든 글 띄우기
+        postList = Post.objects.all()
+
+    return render(request, 'main/blog.html', {'postlist' : postList, 'search_query' : search_query})
