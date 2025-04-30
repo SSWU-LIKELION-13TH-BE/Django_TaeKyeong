@@ -3,6 +3,7 @@ from django.views.decorators.http import require_POST
 from user.models import CustomUser
 from .models import Post, Comment
 from .forms import CommentForm
+from django.db.models import Q, Count
 
 # index.html 페이지를 부르는 index 함수
 def index(request):
@@ -18,6 +19,10 @@ def blog(request):
 def posting(request, pk):
     # 게시글(Post) 중 pk(primary_key)를 이용해 하나의 게시글(post)을 검색
     post=get_object_or_404(Post, pk=pk)
+    # 조회수 증가
+    post.view_count+=1
+    post.save()
+    
     # author가 None이 아니면 nickname을 가져오고, None이면 '익명'으로 처리
     nickname = post.author.nickname if post.author else '익명'
     
@@ -122,3 +127,31 @@ def like_comment(request, comment_pk):
         comment.like_users.add(user)
 
     return redirect('main:posting', pk=comment.post.pk)
+
+# blog함수 생성
+def blog(request):
+    # 검색어를 가져오고, 검색어가 없다면 빈 상태
+    search_query = request.GET.get('search', '')
+    sort = request.GET.get('sort', 'recent')
+    
+    # 검색
+    if search_query:
+        # 제목에 검색어가 포함된 글 리스트 (대소문자 구분 없이)
+        postList = Post.objects.filter(postname__icontains=search_query)
+    else:
+        # 검색어가 없다면 모든 글 띄우기
+        postList = Post.objects.all()
+
+    # 정렬
+    postList = postList.annotate(like_count=Count('like_users'))
+
+    if sort == 'popular': # 좋아요순
+        postList = postList.order_by('-like_users')
+    else: # 시간순
+        postList = postList.order_by('-created_at')
+
+    return render(request, 'main/blog.html', {
+        'postlist': postList,
+        'search_query': search_query,
+        'sort': sort
+    })
