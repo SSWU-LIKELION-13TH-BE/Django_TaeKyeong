@@ -17,5 +17,5 @@ urlpatterns = [
     path('mypage/my_posts', my_posts_view, name='my_posts'),
     path('mypage/my_posts/<int:pk>/delete/', delete_my_post, name='delete_my_post'),
     path('mypage/my_posts/<int:pk>/edit/', edit_post_view, name='edit_post'),
-
+    path('mypage/<str:username>/', mypage_view, name='other_mypage'),
 ]

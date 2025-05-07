@@ -17,20 +17,17 @@ class LoginForm(forms.Form):
 
 class UserUpdateForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, required=False)
-    # username = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     class Meta :
         model = CustomUser
         fields = ['nickname', 'id', 'password']
 
 class GuestbookForm(forms.ModelForm):
+    message = forms.CharField(max_length=100, widget=forms.Textarea(attrs={
+        'placeholder': '방명록을 남겨보세요.',
+        'rows': 3
+    }))
+
     class Meta:
         model = Guestbook
         fields = ['message']
-        widgets = {
-            'message': forms.Textarea(attrs={
-                'rows': 3,
-                'maxlength': 100,
-                'placeholder': '100자 이내로 방명록을 남겨보세요!'
-            }),
-        }

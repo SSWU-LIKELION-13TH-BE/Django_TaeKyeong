@@ -152,26 +152,37 @@ def edit_post_view(request, pk):
 
 # 방명록
 @login_required
-def mypage_view(request):
-    user = request.user
-    form = UserUpdateForm(instance=user)
+def mypage_view(request, username=None):
+    if username is None:
+        owner = request.user
+    else:
+        owner = get_object_or_404(CustomUser, username=username)
+
+    form = UserUpdateForm(instance=owner)
 
     # 방명록 작성 처리
+    gb_form = GuestbookForm()
     if request.method == 'POST':
         gb_form = GuestbookForm(request.POST)
         if gb_form.is_valid():
             guestbook = gb_form.save(commit=False)
-            guestbook.owner = user
+            guestbook.owner = owner
             guestbook.writer = request.user
             guestbook.save()
-            return redirect('user:mypage')
-    else:
-        gb_form = GuestbookForm()
+            gb_form = GuestbookForm()
+            guestbooks = Guestbook.objects.filter(owner=owner).order_by('-created_at')
+            return render(request, 'mypage.html', {
+                'form': form,
+                'guestbooks': guestbooks,
+                'gb_form': gb_form,
+                'owner': owner
+            })
 
-    guestbooks = Guestbook.objects.filter(owner=user).order_by('-created_at')
+    guestbooks = Guestbook.objects.filter(owner=owner).order_by('-created_at')
 
     return render(request, 'mypage.html', {
         'form': form,
         'guestbooks': guestbooks,
         'gb_form': gb_form,
+        'owner': owner
     })
