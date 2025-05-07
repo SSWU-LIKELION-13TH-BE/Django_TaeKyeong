@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyPage</title>
+</head>
+
+<body>
+    <h2>{{user.nickname}}님의 마이페이지</h2>
+    
+    <a href="{% url 'user:my_posts' %}">
+        <button>내가 작성한 글 보기</button>
+    </a>
+    <a href="{% url 'user:update_user' %}">
+        <button>내 정보 수정하기</button>
+    </a>
+
+    <hr/>
+    <!-- 방명록 -->
+    <form method="POST">
+        {% csrf_token %}
+        <p><strong>{{ user.nickname }}</strong>으로 작성:</p>
+        {{ gb_form.as_p }}
+        <button type="submit">방명록 남기기</button>
+      </form>
+
+      <hr/>
+
+      <h3>📖 방명록</h3>
+      {% if guestbooks %}
+        <ul>
+          {% for gb in guestbooks %}
+            <li>
+              <strong>{{ gb.writer.nickname }}</strong>: {{ gb.message }}<br>
+              <small>{{ gb.created_at|date:"Y-m-d H:i" }}</small>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>아직 방명록이 없습니다.</p>
+      {% endif %}
+
+</body>
+
+</html>

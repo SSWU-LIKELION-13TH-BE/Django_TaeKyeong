@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 수정</title>
+</head>
+<body>
+    <h1>게시글 수정</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        제목 <br>
+        <input type="text" name="postname" value="{{ post.postname }}"><br>
+
+        작성자 닉네임: {{ nickname }}<br>
+
+        기술스택<br>
+        <select name="techstack">
+            <option value="fullstack" {% if post.techstack == 'fullstack' %}selected{% endif %}>Full Stack</option>
+            <option value="frontend" {% if post.techstack == 'frontend' %}selected{% endif %}>Frontend</option>
+            <option value="backend" {% if post.techstack == 'backend' %}selected{% endif %}>Backend</option>
+        </select><br><br>
+
+        Github : <input type="text" name="github" value="{{ post.github }}"><br>
+
+        내용<br>
+        <textarea rows="10" cols="50" name="contents">{{ post.contents }}</textarea><br>
+        <input type="file" name="mainphoto"><br>
+        <input type="submit" value="수정 완료">
+    </form>
+
+    <a href="{% url 'user:my_posts' %}"><button>← 내 글 목록</button></a>
+</body>
+</html>

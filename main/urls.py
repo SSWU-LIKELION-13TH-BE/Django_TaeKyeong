@@ -20,7 +20,6 @@ urlpatterns=[
     path('blog/<int:post_pk>/comments/', views.comments_create, name='comments_create'),
     path('blog/<int:post_pk>/comments/<int:comment_pk>/delete/', views.comments_delete, name='comments_delete'),
     path('comments/<int:comment_pk>/like/', views.like_comment, name='like_comment'),
-
 ]
 
 # 이미지 URL 설정

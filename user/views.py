@@ -1,9 +1,11 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate,login
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate,login, update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from .forms import SignUpForm, LoginForm
-from .models import CustomUser
+from .forms import SignUpForm, LoginForm, UserUpdateForm, GuestbookForm
+from .models import CustomUser, Guestbook
+from main.models import Post
 
 #회원가입 기능
 def signup_view(request):
@@ -49,11 +51,12 @@ def login_view(request):
                     'is_authenticated': True,
                     'redirect_url': '/',
                     })
-                #로그인 후에는 홈화면으로 리다이렉트
-                # return redirect('home')
             else:
-                #db에 해당하는 유저가 없으면 해당하는 유저가 없다고 팝업을 띄운다.
-                messages.error(request, '해당하는 유저가 없습니다!')
+                #db에 해당하는 유저가 없으면
+                return JsonResponse({
+                    'error' : '해당하는 유저가 없습니다.',
+                    'is_authenticated' : False
+                }, status=401)
 
     return render(request, 'login.html', {'form': form})
 
@@ -75,3 +78,100 @@ def password_search(request):
         return render(request, 'password.html', {'found_password' :found_password})
         
     return render(request,'password.html')
+
+# mypage 구현
+@login_required
+def update_user_view(request):
+    user = request.user
+    
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, instance=user)
+        if form.is_valid():
+            updated_user = form.save(commit=False)
+            updated_user.username = user.username           
+            new_password = form.cleaned_data.get('password')
+            if new_password:
+                updated_user.set_password(new_password)
+                # updated_user.raw_password = new_password
+            print (f'user name : {updated_user.username}')
+            print (f'user nickname : {updated_user.nickname}')
+            print (f'user id : {updated_user.id}')
+            print (f'user password : {updated_user.password}')
+            updated_user.save()
+            update_session_auth_hash(request, updated_user)
+            messages.success(request, '회원 정보가 성공적으로 수정되었습니다.')
+            return redirect('user:mypage')
+        else:
+            print("invalid form")
+            form = UserUpdateForm(instance=user)
+        return render(request, 'update_user.html', {'form':form})
+    else:
+        form = UserUpdateForm(instance=user)
+        return render(request, 'update_user.html', {'form':form})
+
+
+# mypage에 내 게시글 나타나도록
+@login_required
+def my_posts_view(request):
+    user=request.user
+    my_posts = Post.objects.filter(author=user).order_by('-created_at')
+    return render(request, 'my_posts.html', {'posts':my_posts})
+
+# mypage에서 게시글 삭제하기
+@login_required
+def delete_my_post(request, pk):
+    post = get_object_or_404(Post, pk=pk, author=request.user)
+
+    if request.method == 'POST':
+        post.delete()
+        messages.success(request, '게시글이 삭제되었습니다.')
+        return redirect('user:my_posts')
+
+    return render(request, 'user/confirm_delete.html', {'post': post})
+
+# 게시글 수정하기
+@login_required
+def edit_post_view(request, pk):
+    post = get_object_or_404(Post, pk=pk, author=request.user)
+
+    if request.method == 'POST':
+        post.postname = request.POST.get('postname')
+        post.contents = request.POST.get('contents')
+        post.techstack = request.POST.get('techstack')
+        post.github = request.POST.get('github')
+        if request.FILES.get('mainphoto'):
+            post.mainphoto = request.FILES['mainphoto']
+        post.save()
+        messages.success(request, '게시글이 수정되었습니다.')
+        return redirect('user:my_posts')
+
+    return render(request, 'edit_post.html', {
+        'post': post,
+        'nickname': request.user.nickname
+    })
+
+# 방명록
+@login_required
+def mypage_view(request):
+    user = request.user
+    form = UserUpdateForm(instance=user)
+
+    # 방명록 작성 처리
+    if request.method == 'POST':
+        gb_form = GuestbookForm(request.POST)
+        if gb_form.is_valid():
+            guestbook = gb_form.save(commit=False)
+            guestbook.owner = user
+            guestbook.writer = request.user
+            guestbook.save()
+            return redirect('user:mypage')
+    else:
+        gb_form = GuestbookForm()
+
+    guestbooks = Guestbook.objects.filter(owner=user).order_by('-created_at')
+
+    return render(request, 'mypage.html', {
+        'form': form,
+        'guestbooks': guestbooks,
+        'gb_form': gb_form,
+    })

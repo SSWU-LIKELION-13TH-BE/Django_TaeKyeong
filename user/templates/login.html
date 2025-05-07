@@ -14,11 +14,11 @@
         <button type="submit">로그인</button>
     </form>
 
-    <form action="{% url 'password_search' %}" method="get" style="margin-top: 10px;">
+    <form action="{% url 'user:password_search' %}" method="get" style="margin-top: 10px;">
         <button type="submit">비밀번호 찾기</button>
     </form>
 
-    <form action="{% url 'password_email' %}" method="get" style="margin-top: 10px;">
+    <form action="{% url 'user:password_email' %}" method="get" style="margin-top: 10px;">
         <button type="submit">비밀번호 이메일로 찾기 및 변경</button>
     </form>
 
