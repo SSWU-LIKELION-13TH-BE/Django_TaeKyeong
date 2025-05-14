@@ -1,3 +1,5 @@
+{% load socialaccount %}
+
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -27,6 +29,13 @@
     <script>alert("{{ message }}");</script>
     {% endfor %}
     {% endif %}
+
+    <!-- naver social login -->
+
+    
+    <!-- kakao social login -->
+    <a class="social_login" href="{% provider_login_url 'kakao' %}">카카오 로그인</a>
+    
 </body>
 
 <script>

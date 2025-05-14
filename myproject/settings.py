@@ -52,10 +52,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     'user',
     'main',
+
+    # allauth 관련 앱
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.naver',
+    'allauth.socialaccount.providers.kakao',
 ]
+
+SITE_ID=3 # 사이트 ID 지정 (Django Sites Framework)
+SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_LOGOUT_ON_GET = True
+SOCIALACCOUNT_ADAPTER = 'user.adapter.CustomSocialAccountAdapter'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -65,7 +78,42 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+NAVER_CLIENT_ID = get_secret("NAVER_CLIENT_ID")
+NAVER_CLIENT_SECRET = get_secret("NAVER_CLIENT_SECRET")
+KAKAO_CLIENT_ID = get_secret("KAKAO_CLIENT_ID")
+KAKAO_CLIENT_SECRET = get_secret("KAKAO_CLIENT_SECRET")
+
+SOCIALACCOUNT_PROVIDERS = {
+    "kakao": {
+        "APP": {
+            "client_id": KAKAO_CLIENT_ID,
+            "secret":   KAKAO_CLIENT_SECRET,
+            "key":      ""
+        },
+        "SCOPE":       ["profile_nickname"],
+        "AUTH_PARAMS": {"auth_type": "login"},
+    },
+    "naver": {
+        "APP": {
+            "client_id": NAVER_CLIENT_ID,
+            "secret":   NAVER_CLIENT_SECRET,
+            "key":      ""
+        },
+        "SCOPE":       ["name", "email"],
+        "AUTH_PARAMS": {"prompt": "select_account"},
+    },
+}
+
+# 기존 사용자의 소셜 계정 연결된 경우 기존 사용자로 로그인 가능
+SOCIALACCOUNT_AUTO_SIGNUP = False
 
 ROOT_URLCONF = 'myproject.urls'
 
