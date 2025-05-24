@@ -89,17 +89,17 @@ AUTHENTICATION_BACKENDS = (
 NAVER_CLIENT_ID = get_secret("NAVER_CLIENT_ID")
 NAVER_CLIENT_SECRET = get_secret("NAVER_CLIENT_SECRET")
 KAKAO_CLIENT_ID = get_secret("KAKAO_CLIENT_ID")
-KAKAO_CLIENT_SECRET = get_secret("KAKAO_CLIENT_SECRET")
 
 SOCIALACCOUNT_PROVIDERS = {
     "kakao": {
         "APP": {
-            "client_id": KAKAO_CLIENT_ID,
-            "secret":   KAKAO_CLIENT_SECRET,
-            "key":      ""
+            "client_id": KAKAO_CLIENT_ID, # REST API 키
+            "key": ""
         },
-        "SCOPE":       ["profile_nickname"],
-        "AUTH_PARAMS": {"auth_type": "login"},
+        'SCOPE': ['profile_nickname', 'profile_image'],
+        'AUTH_PARAMS': {
+            'redirect_uri': 'http://127.0.0.1:8000/accounts/kakao/login/callback/'
+        }
     },
     "naver": {
         "APP": {
@@ -113,7 +113,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # 기존 사용자의 소셜 계정 연결된 경우 기존 사용자로 로그인 가능
-SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
 ROOT_URLCONF = 'myproject.urls'
 
@@ -194,13 +194,13 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/user/accounts/login/'
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = get_secret('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = get_secret('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 # IMG 관리
